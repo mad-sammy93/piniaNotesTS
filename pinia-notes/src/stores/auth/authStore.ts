@@ -1,102 +1,82 @@
+import { ref } from 'vue'
 import { defineStore } from "pinia";
-import axios from 'axios'
+import axios, {AxiosError} from 'axios'
 import router from '@/router/index'
-import { UserInfo, Auth , AuthStoreState} from '@/types';
+import { UserInfo } from '@/types';
 
 
-    // interface AuthState {
-    //     id: number,
-    //     name: string,
-    //     accessToken: string,
-    //     isAuthenticated: boolean,
-    //     error: string,
-    //     user: UserInfo | null
-    // }
-    
-    // type AuthStoreState ={
-    //     loading: boolean
-    //     accessToken: string
-    //     refreshTokenTimeout: number
-    //     isAuthenticated: boolean,
-    //     error: string
-    //     user: UserInfo | null
-    // }
-
-// const user = localStorage.getItem('user');
-// const userState = user ? { status: { loggedIn: true }, user }
-//   : { status: { loggedIn: false }, user: null };
-    // interface authState {
-    //     id: number,
-    //     name: string,
-    //     accessToken: string,
-    //     isAuthenticated: boolean,
-    //     error: string,
-    //     user:UserInfo | null
-    // }
+   
   
-export const useAuthStore = defineStore({ 
-    id: 'authStore',
-    state: (): AuthStoreState  => ({
-        loading: false,
-        accessToken: '',
-        isAuthenticated: false,
-        refreshTokenTimeout: 0,
-        error : '',
-        user:  null,
-    }),
+export const useAuthStore = defineStore('authStore',() =>{ 
+    // id: 'authStore',
+    // state: (): AuthStoreState  => ({
+    //     loading: false,
+    //     accessToken: '',
+    //     isAuthenticated: false,
+    //     refreshTokenTimeout: 0,
+    //     error : '',
+    //     user:  null,
+    // }),
 
-    actions: {
-        async login(payload: Auth) {
-                let result = await axios.post( '/auth/login' ,payload,{ 
-                    withCredentials: true,
-                }) .then(response => {
+    //state
+    const loading = ref<boolean>(false)
+    const accessToken = ref<string>('')
+    const isAuthenticated = ref<boolean>(false)
+    const refreshTokenTimeout = ref<number>(0)
+    const error = ref<string>('')
+    const user = ref<UserInfo|null>(null)
 
-                    // console.log(result.status)
-                    // this.startRefreshTokenTimer()        
-                    const { accessToken } = response.data;
-
-                    // axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
-                    // console.log(axios.defaults.headers.common['Authorization'])
-                    // this.user = response
-                    this.accessToken = accessToken
-                    localStorage.setItem('accessToken', accessToken);
-                    // localStorage.setItem('user', JSON.stringify(this.user))
-                    this.isAuthenticated = true;
-                    // this.user = {name:payload.email};
-                    // startRefreshTokenTimer()
-                    
-                    //Getting info from auth token since we dont have a user endpoint
-                    this.getUserInfo()
-                    router.push('/')
-                })
-                .catch(error => {
-                    
-                    console.warn('Login failed:', error);
-                    this.error = error.message || 'Something went wrong'
-                })
-                .finally(() => this.loading = false)
-
-              
-        },
-        getUserInfo() {
+    const login = async (payload: any) => {
+      // Set loading state to true
+      loading.value = true;
+    
+      try {
+        // Send login request to API endpoint with `withCredentials` option set to true
+        const response = await axios.post('/auth/login', payload, {
+          withCredentials: true,
+        });
+    
+        console.log(response);
+    
+        // Set access token in Vue reactive data and local storage
+        accessToken.value = response.data.accessToken;
+        localStorage.setItem('accessToken', accessToken.value);
+    
+        // Set isAuthenticated flag to true
+        isAuthenticated.value = true;
+    
+        // Get user info from auth token
+        getUserInfo();
+    
+        // Redirect user to home page
+        router.push('/');
+      } catch (error) {
+        const err = error as AxiosError
+        console.log(err.response?.data)
+      } finally {
+        // Set loading state to false
+        loading.value = false;
+      }
+    };
+        const getUserInfo = () => {
             // parse json object from base64 encoded jwt token
-            const jwtBase64 = this.accessToken.split('.')[1];
+            const jwtBase64 = accessToken.value.split('.')[1];
             const jwtToken = JSON.parse(atob(jwtBase64));
             // console.log(jwtToken)
-    
+
             // set a timeout to refresh the token a minute before it expires
             const expires = new Date(jwtToken.exp * 1000);
             const timeout = expires.getTime() - Date.now() - (60 * 1000);
-            this.refreshTokenTimeout = setTimeout(this.authToken, timeout);
+            refreshTokenTimeout.value = setTimeout(accessToken.value, timeout);
 
             // console.log(this.refreshTokenTimeout)
-            this.user = jwtToken
+            user.value = jwtToken
             localStorage.setItem('user', JSON.stringify(jwtToken));
-        },
-        async signup(payload: Auth) {
-            // console.log(payload.name)
+        }
+
+        const signup =  async (payload: any) => {
             if(payload.email === '' || !payload.email.includes('@') || payload.password.length < 6){
-                this.formIsValid = false
+                // formIsValid.value = false
             }
             
                 let result = await axios.post("/auth/register", payload ,
@@ -110,46 +90,53 @@ export const useAuthStore = defineStore({
                 })
                 .catch(error => {
                     console.log(error)
-                    this.error = error.message || 'Somethign went wrong'
+                    error.value = error.message || 'Something went wrong'
                     // this.errored = true
                 })
-                .finally(() => this.loading = false)
+                .finally(() => loading.value = false)
 
                 result
                 console.debug(result);
-        },
-        logout() {
-            localStorage.removeItem('accessToken')
-            localStorage.removeItem('user')
-
-            localStorage.removeItem('authStore')
-            localStorage.removeItem('taskStore')
-            
-            //If there was a logout endpoint
-            // axios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
-            this.accessToken = null
-            this.isAuthenticated = false
-            this.user = null
-            router.push('/login')
-            this.error = 'Logged Out'
-          },
-
-        hello(name:any){
-            console.log(name)
-            // refreshToken()
-            // return 'hello '+name;
         }
-    },
 
-    getters: {
-        isLoggedIn: (state) => state.isAuthenticated,
-        // currentUser: (state) => state.user,
-    },
-    mutations:{
-        user(state:any,user :UserInfo){
-            state.user = user
+        const logout = () => {
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('user')
+    
+                localStorage.removeItem('authStore')
+                localStorage.removeItem('taskStore')
+                
+                //If there was a logout endpoint
+                // axios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
+                accessToken.value = ''
+                isAuthenticated.value = false
+                user.value = null
+                router.push('/login')
+                error.value = 'Logged Out'
+    
         }
-    }
+
+    
+
+    // getters: {
+    //     isLoggedIn: (state) => state.isAuthenticated,
+    //     // currentUser: (state) => state.user,
+    // },
+    // mutations:{
+    //     user(state:any,user :UserInfo){
+    //         state.user = user
+    //     }
+    // }
     // persist: true
-
+    return {
+        loading,
+        isAuthenticated,
+        accessToken,
+        refreshTokenTimeout,
+        user,
+        login,
+        getUserInfo,
+        signup,
+        logout
+      }
 })
