@@ -13,12 +13,12 @@ export type Task = {
     title: string;
     description: string;
     isFav: boolean;
-    list_items: SubTask[];
+    list_items: SubTask;
 }
 export type SubTask ={
     id: string;
     title: string;
-    isComplete: boolean;
+    // isComplete: boolean;
     listId: string;
 }
 
@@ -54,6 +54,12 @@ export type useTaskStoreState ={
     tasks: Task[];
     loading: boolean;
     error: AxiosError | null;
+}
+export type TaskStoreState= {
+    tasks:Task|null
+    loading:any
+    error:Error|null
+
 }
 
 export type  useTaskStoreActions ={

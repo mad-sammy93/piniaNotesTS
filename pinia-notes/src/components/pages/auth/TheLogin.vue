@@ -7,15 +7,9 @@ import router from '../../../router'
 export default {
     setup() {
         const authStore = useAuthStore();
-        // const name = ref("");
         const email = ref("");
         const password = ref("");
-        // const formIsValid = ref(true)
-        // const error = ref(null)
-        // const respinseData = ref('')
-        // const isLoading = ref(false)
         const submitLoginData = () => {
-            //   console.log(email)
             if (password.value.length > 0 || email.value.length > 0) {
                 authStore.login({
                     email: email.value,

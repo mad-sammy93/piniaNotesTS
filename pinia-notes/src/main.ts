@@ -4,6 +4,8 @@ import App from '@/App.vue'
 import '@/interceptors/axios';
 // import { AuthStore } from '@/types'
 
+import { Task, SubTask, TaskStoreState, useTaskStoreActions } from '@/types';
+
 import router from './router/index';
 // import store from './stores/Task/TaskStore.js';
 

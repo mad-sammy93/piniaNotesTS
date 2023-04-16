@@ -19,7 +19,7 @@ import { AuthStore } from '@/types'
   //   logout: () => void;
   //   // other auth store methods
   // }
-    const authStore: Store  = useAuthStore();
+    const authStore: AuthStore = useAuthStore();
     const handleLogout = (): void  => {
       authStore.logout();
     }

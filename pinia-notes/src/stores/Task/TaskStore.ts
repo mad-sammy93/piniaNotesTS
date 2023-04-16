@@ -1,16 +1,12 @@
-import { ref } from 'vue'
+import { computed, ref, reactive } from 'vue'
 import { defineStore } from "pinia";
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import { Task, SubTask, useTaskStoreState, useTaskStoreActions } from '@/types';
-
-
-
-
+import { Task, SubTask, TaskStoreState, useTaskStoreActions } from '@/types';
 
 export const useTaskStore = defineStore('taskStore', () => {
 
     // state
-    const tasks = ref<any>(null)
+    const tasks = ref<any|null>(null)
     const loading = ref(false)
     const error = ref<any>(null)
 
@@ -64,7 +60,7 @@ export const useTaskStore = defineStore('taskStore', () => {
             })
             .finally(() => loading.value = false)
     };
-    const loadTaskDetails = async (taskId: Task[]) => {
+    const loadTaskDetails = async (taskId: SubTask) => {
         loading.value = true
 
         const res = axios
@@ -83,7 +79,7 @@ export const useTaskStore = defineStore('taskStore', () => {
     };
 
     // Subtasks
-    const addSubTask = async (TaskId: Task, newSubTask: Task[]) => {
+    const addSubTask = async (TaskId: Task, newSubTask: SubTask) => {
         loading.value = true
 
         const res = await axios
@@ -122,22 +118,37 @@ export const useTaskStore = defineStore('taskStore', () => {
             .finally(() => loading.value = false)
     };
 
-    // getters: {
-    //     isFav() {
-    //         return this.tasks.filter(t =>t.isFav)
-    //     },
-    //     favCount() {
-    //         return this.tasks.reduce((p,c)=>{
-    //             return c.isFav? p+1 :p
-    //         },0)
-    //     },
-    //     totalCount: (state) => {
-    //         return state.tasks.length
-    //     }
-    // },
-    // mutations: {
+    const toggleFav = async (taskId:any) => {
+        const favTask = tasks.value.find((t:Task)=> t.id === taskId)
+        favTask.isFav =!favTask.isFav
 
-    // }
+        // const res = axios
+        //     .post('http://localhost:3000/tasks/'+ id,{isFav: favTask.isFav})
+        //     .then(response => {
+        //         // console.log(response.data)
+        //     })
+        //     .catch(error => {
+        //         console.log(error)
+        //         // this.errored = true
+        //     })
+        //     .finally(() => this.loading = false)
+
+
+        console.log(taskId)
+    }
+
+    const isFav = () => {
+        return tasks.value.filter((t: any) => t.isFav);
+      };
+
+    const favCount = () => {
+        return tasks.value.reduce((p: any, c: any) => {
+          return c.isFav ? p + 1 : p;
+        }, 0);
+      };
+      
+    const totalCount = computed(() =>  tasks.value.length); 
+
     return ({
         tasks, 
         loading, 
@@ -147,6 +158,11 @@ export const useTaskStore = defineStore('taskStore', () => {
         deleteTask, 
         loadTaskDetails, 
         addSubTask, 
-        deleteSubTask
+        deleteSubTask,
+        isFav,
+        toggleFav,
+        favCount,
+        totalCount
+
     })
 })
