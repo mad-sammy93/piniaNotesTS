@@ -101,11 +101,11 @@ export default {
       <img class="empty-state" src="@/assets/empty-state.webp" alt="">
     </div>
   </div>
-  <div class="task-list" v-if="filters === 'favs'">
+  <!-- <div class="task-list" v-if="filters === 'favs'">
     <p>You have {{ taskStore.favCount }} Fav Tasks pending</p>
     <div class="list-item" v-for="task in taskStore.isFav">
       {{ task }}
       <TaskDetail :task="task" />
     </div>
-  </div>
+  </div> -->
 </template>

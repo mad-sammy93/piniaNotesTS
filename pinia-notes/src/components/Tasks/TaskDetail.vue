@@ -63,7 +63,7 @@ export default {
 
 <template>
     <task-modal :show="displayTaskModal" @close="closeTaskModal">
-        <template v-slot:header :title="test">
+        <template v-slot:header title="test">
             {{ task.name }}
         </template>
         <template v-slot:subTask>
