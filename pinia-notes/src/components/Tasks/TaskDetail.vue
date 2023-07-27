@@ -103,8 +103,8 @@ export default {
             <div class="icons">
                 <span class="material-icons view" @click="showTaskDetail(task)">visibility</span>
                 <span class="material-icons delete" @click="taskStore.deleteTask(task.id)">delete</span>
-                <span class="material-icons fav" :class="{ active: task.isFav }"
-                    @click="taskStore.toggleFav(task.id)">favorite</span>
+                <!-- <span class="material-icons fav" :class="{ active: task.isFav }"
+                    @click="taskStore.toggleFav(task.id)">favorite</span> -->
             </div>
         </div>
         <!-- <div  class="ind-item" v-for="item in task.list_items">

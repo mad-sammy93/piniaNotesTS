@@ -118,36 +118,36 @@ export const useTaskStore = defineStore('taskStore', () => {
             .finally(() => loading.value = false)
     };
 
-    const toggleFav = async (taskId:any) => {
-        const favTask = tasks.value.find((t:Task)=> t.id === taskId)
-        favTask.isFav =!favTask.isFav
+    // const toggleFav = async (taskId:any) => {
+    //     const favTask = tasks.value.find((t:Task)=> t.id === taskId)
+    //     favTask.isFav =!favTask.isFav
 
-        // const res = axios
-        //     .post('http://localhost:3000/tasks/'+ id,{isFav: favTask.isFav})
-        //     .then(response => {
-        //         // console.log(response.data)
-        //     })
-        //     .catch(error => {
-        //         console.log(error)
-        //         // this.errored = true
-        //     })
-        //     .finally(() => this.loading = false)
+    //     // const res = axios
+    //     //     .post('http://localhost:3000/tasks/'+ id,{isFav: favTask.isFav})
+    //     //     .then(response => {
+    //     //         // console.log(response.data)
+    //     //     })
+    //     //     .catch(error => {
+    //     //         console.log(error)
+    //     //         // this.errored = true
+    //     //     })
+    //     //     .finally(() => this.loading = false)
 
 
-        console.log(taskId)
-    }
+    //     console.log(taskId)
+    // }
 
-    const isFav = () => {
-        return tasks.value.filter((t: any) => t.isFav);
-      };
+    // const isFav = () => {
+    //     return tasks.value.filter((t: any) => t.isFav);
+    //   };
 
-    const favCount = () => {
-        return tasks.value.reduce((p: any, c: any) => {
-          return c.isFav ? p + 1 : p;
-        }, 0);
-      };
+    // const favCount = () => {
+    //     return tasks.value.reduce((p: any, c: any) => {
+    //       return c.isFav ? p + 1 : p;
+    //     }, 0);
+    //   };
       
-    const totalCount = computed(() =>  tasks.value.length); 
+    const totalCount = computed(() => tasks.value?.length ?? 0);
 
     return ({
         tasks, 
@@ -159,9 +159,9 @@ export const useTaskStore = defineStore('taskStore', () => {
         loadTaskDetails, 
         addSubTask, 
         deleteSubTask,
-        isFav,
-        toggleFav,
-        favCount,
+        // isFav,
+        // toggleFav,
+        // favCount,
         totalCount
 
     })
